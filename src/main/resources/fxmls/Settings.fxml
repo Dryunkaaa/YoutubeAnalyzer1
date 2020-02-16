@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="700.0" style="-fx-background-color: #2E3348;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <AnchorPane layoutY="57.0" prefHeight="545.0" prefWidth="700.0" style="-fx-background-color: #fefefe;">
+            <children>
+                <ImageView fitHeight="89.0" fitWidth="87.0" layoutX="8.0" layoutY="9.0" pickOnBounds="true" preserveRatio="true" />
+                <Label layoutX="9.0" layoutY="501.0" text="Version 1.0">
+                    <font>
+                        <Font name="System Italic" size="20.0" />
+                    </font>
+                </Label>
+                <ImageView fx:id="imageView" fitHeight="78.0" fitWidth="96.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../if_YouTube_social_media_logo-_1964396222.png" />
+                    </image>
+                </ImageView>
+                <Button fx:id="mainMenu" layoutX="203.0" layoutY="31.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="295.0" text="Вернуться на главный экран">
+                    <font>
+                        <Font name="System Bold Italic" size="18.0" />
+                    </font>
+                </Button>
+                <CheckBox fx:id="useCache" layoutX="84.0" layoutY="203.0" mnemonicParsing="false" text="Использовать кэш">
+                    <font>
+                        <Font name="System Bold Italic" size="18.0" />
+                    </font>
+                </CheckBox>
+                <TextField fx:id="pathToCache" layoutX="213.0" layoutY="349.0" prefHeight="31.0" prefWidth="275.0" promptText="Enter path to file and tap Enter">
+                    <font>
+                        <Font size="15.0" />
+                    </font>
+                </TextField>
+                <CheckBox fx:id="showTimeRequest" layoutX="367.0" layoutY="203.0" mnemonicParsing="false" text="Отображать время запроса ">
+                    <font>
+                        <Font name="System Bold" size="18.0" />
+                    </font>
+                </CheckBox>
+                <Text layoutX="259.0" layoutY="315.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Путь к файлу кэша:">
+                    <font>
+                        <Font name="System Bold Italic" size="18.0" />
+                    </font>
+                </Text>
+                <Button fx:id="infoButton" layoutX="521.0" layoutY="349.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="49.0" text="Info">
+                    <font>
+                        <Font name="System Bold" size="15.0" />
+                    </font>
+                </Button>
+            </children>
+        </AnchorPane>
+        <Label layoutX="281.0" text="Settings" textFill="WHITE">
+            <font>
+                <Font name="System Bold Italic" size="37.0" />
+            </font>
+        </Label>
+    </children>
+</AnchorPane>
