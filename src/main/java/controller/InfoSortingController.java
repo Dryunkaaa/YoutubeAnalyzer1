@@ -6,10 +6,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
-import service.sorting.DateSorting;
-import service.sorting.NameSorting;
-import service.sorting.SubscribersSorting;
-import service.sorting.ViewsSorting;
+import service.sorting.*;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -72,28 +69,28 @@ public class InfoSortingController extends AbstractController implements Initial
         analyticMenu.setOnAction(event -> new YouTubeAnalyticController().show());
 
         nameItem.setOnAction(event -> {
-            new NameSorting().sort(channelIdField, tableView, nameColumn, dateColumn, subsColumn,
-                    videoColumn, viewsColumn, timeText);
+            new NameSorting(channelIdField, tableView, nameColumn, dateColumn, subsColumn,
+                    videoColumn, viewsColumn, timeText).sort();
         });
 
         dateItem.setOnAction(event -> {
-            new DateSorting().sort(channelIdField, tableView, nameColumn, dateColumn, subsColumn,
-                    videoColumn, viewsColumn, timeText);
+            new DateSorting(channelIdField, tableView, nameColumn, dateColumn, subsColumn,
+                    videoColumn, viewsColumn, timeText).sort();
         });
 
         subsItem.setOnAction(event -> {
-            new SubscribersSorting().sort(channelIdField, tableView, nameColumn, dateColumn, subsColumn,
-                    videoColumn, viewsColumn, timeText);
+            new SubscribersSorting(channelIdField, tableView, nameColumn, dateColumn, subsColumn,
+                    videoColumn, viewsColumn, timeText).sort();
         });
 
         viewsItem.setOnAction(event -> {
-            new ViewsSorting().sort(channelIdField, tableView, nameColumn, dateColumn, subsColumn,
-                    videoColumn, viewsColumn, timeText);
+            new ViewsSorting(channelIdField, tableView, nameColumn, dateColumn, subsColumn,
+                    videoColumn, viewsColumn, timeText).sort();
         });
 
         videoItem.setOnAction(event -> {
-            new ViewsSorting().sort(channelIdField, tableView, nameColumn, dateColumn, subsColumn,
-                    videoColumn, viewsColumn, timeText);
+            new VideoSorting(channelIdField, tableView, nameColumn, dateColumn, subsColumn,
+                    videoColumn, viewsColumn, timeText).sort();
         });
 
     }

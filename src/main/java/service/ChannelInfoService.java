@@ -27,7 +27,8 @@ public class ChannelInfoService {
     private long startTime;
     private ExecutorProvider executorProvider = ExecutorProvider.getInstance();
 
-    public ChannelInfoService(){}
+    public ChannelInfoService() {
+    }
 
     public ChannelInfoService(TextField channelIdField, TableView<Channel> tableView,
                               TableColumn<Channel, String> nameColumn, TableColumn<Channel, String> dateColumn,
@@ -99,15 +100,21 @@ public class ChannelInfoService {
         boolean useCache = Boolean.parseBoolean(properties.getProperty("cache.use"));
         CacheService cacheService = new CacheService();
 
-        if (useCache && cacheService.channelExists(channelId)) {
-            channelsList.add(cacheService.getChannelFromCache(channelId));
+        if (useCache) {
+
+            if (cacheService.channelExists(channelId)) {
+                channelsList.add(cacheService.getChannelFromCache(channelId));
+            } else {
+                Channel channel = new RequestService().getChannelWithInfo(channelId);
+                channelsList.add(channel);
+
+                ExecutorProvider.getInstance().getExecutorService().submit(() -> {
+                    cacheService.saveChannel(channel);
+                });
+            }
+
         } else {
             channelsList.add(new RequestService().getChannelWithInfo(channelId));
-
-            ExecutorProvider.getInstance().getExecutorService().submit(() -> {
-                cacheService.saveChannel(channelsList.get(0));
-            });
-
         }
     }
 

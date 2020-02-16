@@ -27,6 +27,7 @@ public class Channel {
         this.videoCount = videoCount;
         this.viewsCount = viewsCount;
         this.commentsCount = commentsCount;
+        this.setCreationDate(this.date);
     }
 
     public String getName() {
@@ -90,8 +91,13 @@ public class Channel {
         this.viewsCount = viewsCount;
     }
 
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
+    public void setCreationDate(String date) {
+        try {
+            this.creationDate = new SimpleDateFormat("yyyy-MM-dd").parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        ;
     }
 
     public void setCommentsCount(long commentsCount) {

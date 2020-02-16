@@ -10,6 +10,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
+import service.sorting.CommentsSorting;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -63,7 +64,7 @@ public class MediaResonanceSortingController extends AbstractController implemen
         analyticMenu.setOnAction(event -> new YouTubeAnalyticController().show());
 
         searchButton.setOnAction(event -> {
-            new MediaResonanceService(channelIdField, tableView, nameColumn, dateColumn, subsColumn,
+            new CommentsSorting(channelIdField, tableView, nameColumn, dateColumn, subsColumn,
                     videoColumn, viewsColumn, commentsColumn, timeText).sort();
         });
 

@@ -50,6 +50,7 @@ public class CacheService {
     private void removeFromCache(Channel channel) {
         List<Channel> cachedChannels = getCachedChannels();
         cachedChannels.remove(channel);
+        clearCache();
 
         for (Channel cachedChannel : cachedChannels) {
             saveChannel(cachedChannel);
@@ -75,7 +76,6 @@ public class CacheService {
             return true;
         }
 
-        clearCache();
         removeFromCache(channel);
         return false;
     }

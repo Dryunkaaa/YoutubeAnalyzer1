@@ -11,9 +11,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
-import service.sorting.CommentsSorting;
 
-import java.util.Collections;
 import java.util.Properties;
 
 public class MediaResonanceService {
@@ -49,6 +47,8 @@ public class MediaResonanceService {
         this.commentsColumn = commentsColumn;
         this.showTime = showTime;
     }
+
+    public MediaResonanceService(){}
 
     public void show() {
         startTime = System.currentTimeMillis();
@@ -98,43 +98,27 @@ public class MediaResonanceService {
         });
     }
 
-    public void sort() {
-        startTime = System.currentTimeMillis();
-        ObservableList<Channel> channelsList = FXCollections.observableArrayList();
-
-        executorProvider.getExecutorService().submit(() -> {
-            String[] channelIds = channelIdField.getText().split("\\s+");
-
-            for (int i = 0; i < channelIds.length; i++) {
-                int index = i;
-
-                executorProvider.getExecutorService().submit(() -> {
-                    checkIfCacheUsed(channelsList, channelIds[index]);
-
-                    if (channelsList.size() == channelIds.length) {
-                        Collections.sort(channelsList, new CommentsSorting().getComparator());
-
-                        commentsColumn.setCellValueFactory(new PropertyValueFactory<>("commentsCount"));
-                        new ViewService().showData(tableView, nameColumn, dateColumn, subsColumn,
-                                videoColumn, viewsColumn, channelsList);
-
-                        new ChannelInfoService().showOperationTime(showTime, startTime);
-                    }
-                });
-            }
-        });
-    }
-
-    private void checkIfCacheUsed(ObservableList<Channel> channelsList, String channelId) {
+    public void checkIfCacheUsed(ObservableList<Channel> channelsList, String channelId) {
         Properties properties = new PropertiesProvider().get();
         boolean useCache = Boolean.parseBoolean(properties.getProperty("cache.use"));
         CacheService cacheService = new CacheService();
 
-        if (useCache && cacheService.channelContainsComments(channelId)) {
-            channelsList.add(cacheService.getChannelFromCache(channelId));
+
+        if (useCache) {
+
+            if (cacheService.channelContainsComments(channelId)) {
+                channelsList.add(cacheService.getChannelFromCache(channelId));
+            } else {
+                Channel channel = new RequestService().getChannelWithComments(channelId);
+                channelsList.add(channel);
+
+                ExecutorProvider.getInstance().getExecutorService().submit(() -> {
+                    cacheService.saveChannel(channel);
+                });
+            }
+
         } else {
             channelsList.add(new RequestService().getChannelWithComments(channelId));
-            cacheService.saveChannel(channelsList.get(0));
         }
     }
 }
