@@ -1,18 +1,21 @@
 package controller;
 
 import entity.Channel;
-import service.MediaResonanceService;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
+import service.MediaResonanceService;
 import service.sorting.CommentsSorting;
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.ResourceBundle;
 
 public class MediaResonanceSortingController extends AbstractController implements Initializable {
@@ -64,11 +67,14 @@ public class MediaResonanceSortingController extends AbstractController implemen
         analyticMenu.setOnAction(event -> new YouTubeAnalyticController().show());
 
         searchButton.setOnAction(event -> {
-            new CommentsSorting(channelIdField, tableView, nameColumn, dateColumn, subsColumn,
-                    videoColumn, viewsColumn, commentsColumn, timeText).sort();
+            long start = System.currentTimeMillis();
+            ObservableList<Channel> channelsList = new MediaResonanceService().getChannelsList(channelIdField.getText());
+            Collections.sort(channelsList, new CommentsSorting().getComparator());
+
+            commentsColumn.setCellValueFactory(new PropertyValueFactory<>("commentsCount"));
+            showChannelsDataIntoTable(tableView, nameColumn, dateColumn, subsColumn, videoColumn, viewsColumn, channelsList);
+            showOperationTime(timeText, start);
         });
-
-
     }
 
     @Override

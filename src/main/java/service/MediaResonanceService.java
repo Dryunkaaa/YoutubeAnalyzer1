@@ -3,122 +3,70 @@ package service;
 import entity.Channel;
 import entity.provider.ExecutorProvider;
 import entity.provider.PropertiesProvider;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.text.Text;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class MediaResonanceService {
 
-    private static final int CHANNELS_ID_NUMBER = 2;
-
-    private TextField channelIdField;
-    private TableView<Channel> tableView;
-    private TableColumn<Channel, String> nameColumn;
-    private TableColumn<Channel, String> dateColumn;
-    private TableColumn<Channel, String> subsColumn;
-    private TableColumn<Channel, String> videoColumn;
-    private TableColumn<Channel, String> viewsColumn;
-    private TableColumn<Channel, String> commentsColumn;
-    private Text showTime;
-
-    private long startTime;
     private ExecutorProvider executorProvider = ExecutorProvider.getInstance();
 
-    public MediaResonanceService(TextField channelIdField, TableView<Channel> tableView,
-                                 TableColumn<Channel, String> nameColumn, TableColumn<Channel, String> dateColumn,
-                                 TableColumn<Channel, String> subsColumn, TableColumn<Channel, String> videoColumn,
-                                 TableColumn<Channel, String> viewsColumn, TableColumn<Channel, String> commentsColumn,
-                                 Text showTime) {
-
-        this.channelIdField = channelIdField;
-        this.tableView = tableView;
-        this.nameColumn = nameColumn;
-        this.subsColumn = subsColumn;
-        this.dateColumn = dateColumn;
-        this.videoColumn = videoColumn;
-        this.viewsColumn = viewsColumn;
-        this.commentsColumn = commentsColumn;
-        this.showTime = showTime;
-    }
-
-    public MediaResonanceService(){}
-
-    public void show() {
-        startTime = System.currentTimeMillis();
-        ObservableList<Channel> channelsList = FXCollections.observableArrayList();
-
-        executorProvider.getExecutorService().submit(() -> {
-            checkIfCacheUsed(channelsList, channelIdField.getText());
-
-            commentsColumn.setCellValueFactory(new PropertyValueFactory<>("commentsCount"));
-            new ViewService().showData(tableView, nameColumn, dateColumn, subsColumn,
-                    videoColumn, viewsColumn, channelsList);
-
-            new ChannelInfoService().showOperationTime(showTime, startTime);
-        });
-    }
-
-    public void compare() {
-        startTime = System.currentTimeMillis();
-        ObservableList<Channel> channelsList = FXCollections.observableArrayList();
-
-        executorProvider.getExecutorService().submit(() -> {
-            String[] channelIds = channelIdField.getText().split("\\s+");
-
-            if (channelIds.length == CHANNELS_ID_NUMBER) {
-                for (int i = 0; i < channelIds.length; i++) {
-                    int index = i;
-
-                    executorProvider.getExecutorService().submit(() -> {
-                        checkIfCacheUsed(channelsList, channelIds[index]);
-
-                        if (channelsList.size() == CHANNELS_ID_NUMBER) {
-
-                            commentsColumn.setCellValueFactory(new PropertyValueFactory<>("commentsCount"));
-                            new ViewService().showData(tableView, nameColumn, dateColumn, subsColumn,
-                                    videoColumn, viewsColumn, channelsList);
-
-                            new ChannelInfoService().showOperationTime(showTime, startTime);
-                        }
-                    });
-                }
-
-            } else {
-                Platform.runLater(() -> {
-                    new AlertService().showMessage("Исправьте кол-во каналов");
-                });
-            }
-        });
-    }
-
-    public void checkIfCacheUsed(ObservableList<Channel> channelsList, String channelId) {
+    public Channel getChannel(String channelId) {
         Properties properties = new PropertiesProvider().get();
         boolean useCache = Boolean.parseBoolean(properties.getProperty("cache.use"));
         CacheService cacheService = new CacheService();
-
+        Channel channel = null;
 
         if (useCache) {
 
             if (cacheService.channelContainsComments(channelId)) {
-                channelsList.add(cacheService.getChannelFromCache(channelId));
+                channel = cacheService.getChannelFromCache(channelId);
             } else {
-                Channel channel = new RequestService().getChannelWithComments(channelId);
-                channelsList.add(channel);
+                channel = new RequestService().getChannelWithComments(channelId);
 
-                ExecutorProvider.getInstance().getExecutorService().submit(() -> {
-                    cacheService.saveChannel(channel);
+                Channel finalChannel = channel;
+                executorProvider.getExecutorService().submit(() -> {
+                    cacheService.saveChannel(finalChannel);
                 });
             }
 
         } else {
-            channelsList.add(new RequestService().getChannelWithComments(channelId));
+            channel = new RequestService().getChannelWithComments(channelId);
         }
+
+        return channel;
+    }
+
+    public ObservableList<Channel> getChannelsList(String channelIds) {
+        ObservableList<Channel> channelsList = FXCollections.observableArrayList();
+        String[] ids = channelIds.split("\\s+");
+        List<Future> tasks = new ArrayList<>(ids.length);
+
+        for (int i = 0; i < ids.length; i++) {
+            int index = i;
+
+            Future future = executorProvider.getExecutorService().submit(() -> {
+                channelsList.add(getChannel(ids[index]));
+            });
+
+            tasks.add(future);
+        }
+
+        for (Future future : tasks) {
+            try {
+                future.get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return channelsList;
     }
 }

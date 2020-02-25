@@ -1,12 +1,12 @@
 package service;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
-import entity.request.playlist.ResponseComment;
-import entity.request.ResponseGlobalInfo;
 import entity.Channel;
+import entity.provider.ExecutorProvider;
+import entity.request.ResponseGlobalInfo;
+import entity.request.playlist.ResponseComment;
 import entity.request.video.ResponseVideo;
 import javafx.application.Platform;
-import entity.provider.ExecutorProvider;
 
 import java.util.ArrayList;
 import java.util.Collections;

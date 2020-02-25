@@ -1,14 +1,17 @@
 package controller;
 
 import entity.Channel;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
+import service.ChannelInfoService;
 import service.sorting.*;
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.ResourceBundle;
 
 public class InfoSortingController extends AbstractController implements Initializable {
@@ -69,30 +72,34 @@ public class InfoSortingController extends AbstractController implements Initial
         analyticMenu.setOnAction(event -> new YouTubeAnalyticController().show());
 
         nameItem.setOnAction(event -> {
-            new NameSorting(channelIdField, tableView, nameColumn, dateColumn, subsColumn,
-                    videoColumn, viewsColumn, timeText).sort();
+            showSortedData(new NameSorting());
         });
 
         dateItem.setOnAction(event -> {
-            new DateSorting(channelIdField, tableView, nameColumn, dateColumn, subsColumn,
-                    videoColumn, viewsColumn, timeText).sort();
+            showSortedData(new DateSorting());
         });
 
         subsItem.setOnAction(event -> {
-            new SubscribersSorting(channelIdField, tableView, nameColumn, dateColumn, subsColumn,
-                    videoColumn, viewsColumn, timeText).sort();
+            showSortedData(new SubscribersSorting());
         });
 
         viewsItem.setOnAction(event -> {
-            new ViewsSorting(channelIdField, tableView, nameColumn, dateColumn, subsColumn,
-                    videoColumn, viewsColumn, timeText).sort();
+            showSortedData(new ViewsSorting());
         });
 
         videoItem.setOnAction(event -> {
-            new VideoSorting(channelIdField, tableView, nameColumn, dateColumn, subsColumn,
-                    videoColumn, viewsColumn, timeText).sort();
+            showSortedData(new VideoSorting());
         });
 
+    }
+
+    private void showSortedData(AbstractSorting abstractSorting){
+        long start = System.currentTimeMillis();
+
+        ObservableList<Channel> channelsList = new ChannelInfoService().getChannelsList(channelIdField.getText());
+        Collections.sort(channelsList, abstractSorting.getComparator());
+        showChannelsDataIntoTable(tableView, nameColumn, dateColumn, subsColumn, videoColumn, viewsColumn, channelsList);
+        showOperationTime(timeText, start);
     }
 
     @Override

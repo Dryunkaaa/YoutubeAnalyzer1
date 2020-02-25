@@ -1,7 +1,9 @@
 package controller;
 
 import entity.Channel;
-import service.ChannelInfoService;
+import entity.provider.ExecutorProvider;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -10,9 +12,12 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
+import service.ChannelInfoService;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class GlobalInfoController extends AbstractController implements Initializable {
 
@@ -59,10 +64,27 @@ public class GlobalInfoController extends AbstractController implements Initiali
         mainMenu.setOnAction(event -> new MainMenuController().show());
         analyticMenu.setOnAction(event -> new YouTubeAnalyticController().show());
         searchButton.setOnAction(event -> {
-            new ChannelInfoService(channelIdField, tableView, nameColumn, dateColumn, subsColumn,
-                    videoColumn, viewsColumn, timeText).show();
+            long start = System.currentTimeMillis();
+            ObservableList<Channel> channelsList = FXCollections.observableArrayList();
+
+            Future future = ExecutorProvider.getInstance().getExecutorService().submit(()->{
+                Channel channel = new ChannelInfoService().getChannel(channelIdField.getText());
+                channelsList.add(channel);
+            });
+
+            try {
+                future.get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+
+            showChannelsDataIntoTable(tableView, nameColumn, dateColumn, subsColumn, videoColumn, viewsColumn, channelsList);
+            showOperationTime(timeText, start);
         });
     }
+
 
     @Override
     public void show() {

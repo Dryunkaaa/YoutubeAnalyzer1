@@ -1,18 +1,19 @@
 package controller;
 
+import entity.PropertiesSaver;
+import entity.provider.PropertiesProvider;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import entity.provider.PropertiesProvider;
-import entity.PropertiesSaver;
 import service.AlertService;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -64,7 +65,6 @@ public class SettingsController extends AbstractController implements Initializa
                 properties.setProperty("cache.use", String.valueOf(useCache.isSelected()));
                 new PropertiesSaver().save(properties);
             }).start();
-
         });
     }
 

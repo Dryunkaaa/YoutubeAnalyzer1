@@ -1,18 +1,24 @@
 package controller;
 
 import entity.Channel;
-import service.MediaResonanceService;
+import entity.provider.ExecutorProvider;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
+import service.MediaResonanceService;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class MediaResonanceController extends AbstractController implements Initializable {
 
@@ -62,8 +68,25 @@ public class MediaResonanceController extends AbstractController implements Init
         mainMenu.setOnAction(event -> new MainMenuController().show());
         analyticMenu.setOnAction(event -> new YouTubeAnalyticController().show());
         searchButton.setOnAction(event -> {
-            new MediaResonanceService(channelIdField, tableView, nameColumn, dateColumn, subsColumn,
-                    videoColumn, viewsColumn, commentsColumn, timeText).show();
+            long start = System.currentTimeMillis();
+            ObservableList<Channel> channelsList = FXCollections.observableArrayList();
+
+            Future future = ExecutorProvider.getInstance().getExecutorService().submit(()->{
+                Channel channel = new MediaResonanceService().getChannel(channelIdField.getText());
+               channelsList.add(channel);
+            });
+
+            try {
+                future.get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+
+            commentsColumn.setCellValueFactory(new PropertyValueFactory<>("commentsCount"));
+            showChannelsDataIntoTable(tableView, nameColumn, dateColumn, subsColumn, videoColumn, viewsColumn, channelsList);
+            showOperationTime(timeText, start);
         });
     }
 

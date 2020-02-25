@@ -1,14 +1,17 @@
 package controller;
 
 import entity.Channel;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
+import service.AlertService;
 import service.MediaResonanceService;
 
 import java.net.URL;
@@ -62,8 +65,17 @@ public class CompareMediaResonanceController extends AbstractController implemen
         mainMenu.setOnAction(event -> new MainMenuController().show());
         analyticMenu.setOnAction(event -> new YouTubeAnalyticController().show());
         searchButton.setOnAction(event -> {
-            new MediaResonanceService(channelIdField, tableView, nameColumn, dateColumn, subsColumn,
-                    videoColumn, viewsColumn, commentsColumn, timeText).compare();
+            if (channelIdField.getText().split("\\s+").length == 2){
+                long start = System.currentTimeMillis();
+                ObservableList<Channel> channelsList = new MediaResonanceService().getChannelsList(channelIdField.getText());
+
+                commentsColumn.setCellValueFactory(new PropertyValueFactory<>("commentsCount"));
+                showChannelsDataIntoTable(tableView, nameColumn, dateColumn, subsColumn, videoColumn, viewsColumn, channelsList);
+
+                showOperationTime(timeText, start);
+            }else{
+                new AlertService().showMessage("Исправьте кол-во каналов");
+            }
         });
     }
 
