@@ -22,9 +22,7 @@ public class App extends Application {
 
         primaryStage.setTitle("YouTube Analyzer");
         primaryStage.show();
-        primaryStage.setOnCloseRequest(event -> {
-            System.exit(0);
-        });
+        primaryStage.setOnCloseRequest(event -> System.exit(0));
     }
 
     public static Stage getWindow() {

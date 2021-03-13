@@ -9,18 +9,17 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import service.AlertService;
+import service.Alerter;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
-public class SettingsController extends AbstractController implements Initializable {
+public class SettingsController extends AbstractController implements Initializable, Alerter {
 
     @FXML
     private ImageView imageView;
@@ -41,84 +40,68 @@ public class SettingsController extends AbstractController implements Initializa
     private CheckBox showTimeRequest;
 
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        loadSettings();
+    public void show() {
+        loadControllerWindow(this, "fxmls/Settings.fxml");
+    }
 
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        new Thread(this::loadSettings).start();
         new Thread(() -> rotatePicture(imageView)).start();
 
+        addHandlerToControls();
+    }
+
+    private void addHandlerToControls() {
         mainMenu.setOnAction(event -> new MainMenuController().show());
         infoButton.setOnAction(event -> {
-            new AlertService().showMessage("Введите путь к папке с кэшем, например src/main/cache , и нажмите Enter");
+            alert("Введите путь к папке с кэшем, например src/main/cache , и нажмите Enter");
         });
 
-        saveCache();
-        saveShowTime();
-        savePath();
+        useCache.setOnAction(event -> new Thread(() -> {
+            Properties properties = PropertiesProvider.getProps();
+            properties.setProperty("cache.use", String.valueOf(useCache.isSelected()));
 
-    }
+            PropertiesSaver.save(properties);
+        }).start());
 
-    @FXML
-    void saveCache() {
-        useCache.setOnAction(event -> {
-            new Thread(() -> {
-                Properties properties = new PropertiesProvider().get();
-                properties.setProperty("cache.use", String.valueOf(useCache.isSelected()));
-                new PropertiesSaver().save(properties);
-            }).start();
-        });
-    }
+        showTimeRequest.setOnAction(event -> new Thread(() -> {
+            Properties properties = PropertiesProvider.getProps();
+            properties.setProperty("showOperationTime", String.valueOf(showTimeRequest.isSelected()));
 
-    @FXML
-    void saveShowTime() {
-        showTimeRequest.setOnAction(event -> {
-            new Thread(() -> {
-                Properties properties = new PropertiesProvider().get();
-                properties.setProperty("showOperationTime", String.valueOf(showTimeRequest.isSelected()));
-                new PropertiesSaver().save(properties);
-            }).start();
-        });
-    }
+            PropertiesSaver.save(properties);
+        }).start());
 
-    @FXML
-    void savePath() {
-        pathToCache.setOnKeyPressed(ke -> {
-            if (ke.getCode().equals(KeyCode.ENTER)) {
-
-                new Thread(() -> {
-                    try {
-                        String path = pathToCache.getText();
-
-                        Properties properties = new PropertiesProvider().get();
-                        properties.setProperty("cache.path", path);
-                        new PropertiesSaver().save(properties);
-
-                        File file = new File(path);
-                        if (Files.notExists(file.toPath())) {
-                            Files.createDirectory(Paths.get(path));
-                        }
-
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }).start();
+        pathToCache.setOnKeyPressed(keyEvent -> {
+            if (keyEvent.getCode().equals(KeyCode.ENTER)) {
+                new Thread(this::savePathToCache).start();
             }
         });
     }
 
-    @FXML
-    void loadSettings() {
-        new Thread(()->{
-            Properties properties = new PropertiesProvider().get();
-            useCache.setSelected(Boolean.parseBoolean(properties.getProperty("cache.use", String.valueOf(false))));
-            showTimeRequest.setSelected(Boolean.parseBoolean(properties.getProperty("showOperationTime", String.valueOf(false))));
-            pathToCache.setText(properties.getProperty("cache.path", "src/main/cache"));
-        }).start();
+    private void savePathToCache() {
+        try {
+            String path = pathToCache.getText();
+
+            Properties properties = PropertiesProvider.getProps();
+            properties.setProperty("cache.path", path);
+
+            PropertiesSaver.save(properties);
+
+            if (Files.notExists(Path.of(path))) {
+                Files.createDirectory(Paths.get(path));
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    @Override
-    public void show() {
-        loadControllerWindow(this, "fxmls/Settings.fxml");
+    private void loadSettings() {
+        Properties properties = PropertiesProvider.getProps();
+
+        useCache.setSelected(Boolean.parseBoolean(properties.getProperty("cache.use", String.valueOf(false))));
+        showTimeRequest.setSelected(Boolean.parseBoolean(properties.getProperty("showOperationTime", String.valueOf(false))));
+        pathToCache.setText(properties.getProperty("cache.path", "src/main/cache"));
     }
 }

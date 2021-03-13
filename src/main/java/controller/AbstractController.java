@@ -3,7 +3,6 @@ package controller;
 import application.App;
 import entity.Channel;
 import entity.provider.PropertiesProvider;
-import javafx.animation.ParallelTransition;
 import javafx.animation.RotateTransition;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -20,7 +19,6 @@ import javafx.scene.text.Text;
 import javafx.util.Duration;
 
 import java.io.IOException;
-import java.util.Properties;
 
 public abstract class AbstractController {
 
@@ -39,24 +37,17 @@ public abstract class AbstractController {
     }
 
     protected void rotatePicture(ImageView imageView) {
-        Timeline timeline = new Timeline();
-        timeline.setAutoReverse(true);
-
         RotateTransition rotateTransition = new RotateTransition(Duration.millis(3000), imageView);
         rotateTransition.setByAngle(180f);
-        rotateTransition.setCycleCount(4);
+        rotateTransition.setCycleCount(Timeline.INDEFINITE);
         rotateTransition.setAutoReverse(true);
 
-        ParallelTransition parallelTransition = new ParallelTransition();
-        parallelTransition.getChildren().addAll(rotateTransition);
-        parallelTransition.setCycleCount(Timeline.INDEFINITE);
-        parallelTransition.play();
+        rotateTransition.play();
     }
 
     public void showOperationTime(Text showTime, long startTime) {
         Platform.runLater(() -> {
-            Properties properties = new PropertiesProvider().get();
-            boolean showOperationTime = Boolean.parseBoolean(properties.getProperty("showOperationTime"));
+            boolean showOperationTime = Boolean.parseBoolean(PropertiesProvider.getProps().getProperty("showOperationTime"));
 
             if (showOperationTime) {
                 long time = System.currentTimeMillis() - startTime;

@@ -67,16 +67,12 @@ public class GlobalInfoController extends AbstractController implements Initiali
             long start = System.currentTimeMillis();
             ObservableList<Channel> channelsList = FXCollections.observableArrayList();
 
-            Future future = ExecutorProvider.getInstance().getExecutorService().submit(()->{
-                Channel channel = new ChannelInfoService().getChannel(channelIdField.getText());
-                channelsList.add(channel);
-            });
-
             try {
-                future.get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
+                ((Future) ExecutorProvider.executorService.submit(() -> {
+                    Channel channel = new ChannelInfoService().getChannel(channelIdField.getText());
+                    channelsList.add(channel);
+                })).get();
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
 

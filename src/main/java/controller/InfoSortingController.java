@@ -11,7 +11,6 @@ import service.ChannelInfoService;
 import service.sorting.*;
 
 import java.net.URL;
-import java.util.Collections;
 import java.util.ResourceBundle;
 
 public class InfoSortingController extends AbstractController implements Initializable {
@@ -71,33 +70,23 @@ public class InfoSortingController extends AbstractController implements Initial
         mainMenu.setOnAction(event -> new MainMenuController().show());
         analyticMenu.setOnAction(event -> new YouTubeAnalyticController().show());
 
-        nameItem.setOnAction(event -> {
-            showSortedData(new NameSorting());
-        });
+        nameItem.setOnAction(event -> showSortedData(new NameSorting()));
 
-        dateItem.setOnAction(event -> {
-            showSortedData(new DateSorting());
-        });
+        dateItem.setOnAction(event -> showSortedData(new DateSorting()));
 
-        subsItem.setOnAction(event -> {
-            showSortedData(new SubscribersSorting());
-        });
+        subsItem.setOnAction(event -> showSortedData(new SubscribersSorting()));
 
-        viewsItem.setOnAction(event -> {
-            showSortedData(new ViewsSorting());
-        });
+        viewsItem.setOnAction(event -> showSortedData(new ViewsSorting()));
 
-        videoItem.setOnAction(event -> {
-            showSortedData(new VideoSorting());
-        });
-
+        videoItem.setOnAction(event -> showSortedData(new VideoSorting()));
     }
 
-    private void showSortedData(AbstractSorting abstractSorting){
+    private void showSortedData(AbstractSorting abstractSorting) {
         long start = System.currentTimeMillis();
 
         ObservableList<Channel> channelsList = new ChannelInfoService().getChannelsList(channelIdField.getText());
-        Collections.sort(channelsList, abstractSorting.getComparator());
+        channelsList.sort(abstractSorting.getComparator());
+
         showChannelsDataIntoTable(tableView, nameColumn, dateColumn, subsColumn, videoColumn, viewsColumn, channelsList);
         showOperationTime(timeText, start);
     }

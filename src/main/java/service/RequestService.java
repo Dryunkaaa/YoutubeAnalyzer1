@@ -3,24 +3,22 @@ package service;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import entity.Channel;
 import entity.provider.ExecutorProvider;
-import entity.request.ResponseGlobalInfo;
-import entity.request.playlist.ResponseComment;
-import entity.request.video.ResponseVideo;
 import javafx.application.Platform;
+import request.ResponseGlobalInfo;
+import request.playlist.ResponseComment;
+import request.video.ResponseVideo;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class RequestService {
+public class RequestService implements Alerter {
 
     public Channel getChannelWithInfo(String channelId) {
         try {
             ResponseGlobalInfo globalInfo = ResponseGlobalInfo.getInstance(channelId);
 
-            if (globalInfo.getItems().length == 0) {
-                Platform.runLater(() -> new AlertService().showMessage("Убедитесь в правильности запроса!"));
-            } else {
+            if (globalInfo.getItems().length > 0) {
                 Channel channel = new Channel();
                 channel.setId(channelId);
                 initChannelFields(channel, globalInfo);
@@ -31,11 +29,12 @@ public class RequestService {
             e.printStackTrace();
         }
 
-        return null;
+        Platform.runLater(() -> alert("Убедитесь в правильности запроса!"));
 
+        return new Channel();
     }
 
-    private void initChannelFields(Channel channel, ResponseGlobalInfo globalInfo){
+    private void initChannelFields(Channel channel, ResponseGlobalInfo globalInfo) {
         String publishedDate = globalInfo.getItems()[0].getSnippet().getPublishedAt();
 
         String name = globalInfo.getItems()[0].getSnippet().getTitle();
@@ -70,7 +69,7 @@ public class RequestService {
             e.printStackTrace();
         }
 
-        return null;
+        return new Channel();
     }
 
     private List<String> getChannelsIds(ResponseGlobalInfo globalInfo) {
@@ -105,14 +104,14 @@ public class RequestService {
     private List<Long> getCommentsCountList(List<String> channelIdList) {
         List<Long> comments = Collections.synchronizedList(new ArrayList<>());
 
-        for (int i = 0; i < channelIdList.size(); i++) {
+        for (String channelId : channelIdList) {
             try {
-                ResponseVideo video = ResponseVideo.getInstance(channelIdList.get(i));
+                ResponseVideo video = ResponseVideo.getInstance(channelId);
 
                 for (int j = 0; j < video.getItems().length; j++) {
                     int index = j;
 
-                    ExecutorProvider.getInstance().getExecutorService().submit(() -> {
+                    ExecutorProvider.executorService.submit(() -> {
                         comments.add(Long.parseLong(video.getItems()[index].getStatistics().getCommentCount()));
                     });
                 }
@@ -128,9 +127,10 @@ public class RequestService {
     private long getCommentsCount(List<Long> commentsList) {
         long commentsCount = 0;
 
-        for (int i = 0; i < commentsList.size(); i++) {
-            commentsCount += commentsList.get(i);
+        for (Long comments : commentsList) {
+            commentsCount += comments;
         }
+
         return commentsCount;
     }
 }

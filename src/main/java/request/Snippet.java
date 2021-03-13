@@ -1,4 +1,4 @@
-package entity.request;
+package request;
 
 public class Snippet {
     private String title;

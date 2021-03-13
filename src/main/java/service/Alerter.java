@@ -2,9 +2,9 @@ package service;
 
 import javafx.scene.control.Alert;
 
-public class AlertService {
+public interface Alerter {
 
-    public void showMessage(String message){
+    default void alert(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setHeaderText(message);
         alert.showAndWait();

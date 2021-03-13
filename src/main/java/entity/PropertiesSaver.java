@@ -7,12 +7,11 @@ import java.util.Properties;
 
 public class PropertiesSaver {
 
-    public void save(Properties properties){
+    public static void save(Properties properties) {
         try (OutputStream output = new FileOutputStream("application.properties")) {
             properties.store(output, null);
         } catch (IOException io) {
             io.printStackTrace();
         }
     }
-
 }

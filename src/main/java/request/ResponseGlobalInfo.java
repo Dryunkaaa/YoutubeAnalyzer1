@@ -1,4 +1,4 @@
-package entity.request;
+package request;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -8,11 +8,11 @@ import entity.provider.ApiKeyProvider;
 public class ResponseGlobalInfo {
     private Item<Snippet, Statistic, ContentDetails<RelatedPlaylists>>[] items;
 
-    private ResponseGlobalInfo(){}
+    private ResponseGlobalInfo() {}
 
     public static ResponseGlobalInfo getInstance(String channelId) throws UnirestException {
         HttpResponse<ResponseGlobalInfo> response = Unirest.get("https://www.googleapis.com/youtube/v3/channels")
-                .queryString("key", new ApiKeyProvider().getApi())
+                .queryString("key", ApiKeyProvider.getKey())
                 .queryString("id", channelId)
                 .queryString("part", "snippet,contentDetails,statistics")
                 .asObject(ResponseGlobalInfo.class);

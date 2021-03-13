@@ -11,13 +11,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
-import service.AlertService;
+import service.Alerter;
 import service.MediaResonanceService;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class CompareMediaResonanceController extends AbstractController implements Initializable {
+public class CompareMediaResonanceController extends AbstractController implements Initializable, Alerter {
 
     @FXML
     private ImageView imageView;
@@ -65,7 +65,7 @@ public class CompareMediaResonanceController extends AbstractController implemen
         mainMenu.setOnAction(event -> new MainMenuController().show());
         analyticMenu.setOnAction(event -> new YouTubeAnalyticController().show());
         searchButton.setOnAction(event -> {
-            if (channelIdField.getText().split("\\s+").length == 2){
+            if (channelIdField.getText().split("\\s+").length == 2) {
                 long start = System.currentTimeMillis();
                 ObservableList<Channel> channelsList = new MediaResonanceService().getChannelsList(channelIdField.getText());
 
@@ -73,8 +73,8 @@ public class CompareMediaResonanceController extends AbstractController implemen
                 showChannelsDataIntoTable(tableView, nameColumn, dateColumn, subsColumn, videoColumn, viewsColumn, channelsList);
 
                 showOperationTime(timeText, start);
-            }else{
-                new AlertService().showMessage("Исправьте кол-во каналов");
+            } else {
+                alert("Исправьте кол-во каналов");
             }
         });
     }

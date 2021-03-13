@@ -71,16 +71,12 @@ public class MediaResonanceController extends AbstractController implements Init
             long start = System.currentTimeMillis();
             ObservableList<Channel> channelsList = FXCollections.observableArrayList();
 
-            Future future = ExecutorProvider.getInstance().getExecutorService().submit(()->{
-                Channel channel = new MediaResonanceService().getChannel(channelIdField.getText());
-               channelsList.add(channel);
-            });
-
             try {
-                future.get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
+                ((Future) ExecutorProvider.executorService.submit(() -> {
+                    Channel channel = new MediaResonanceService().getChannel(channelIdField.getText());
+                    channelsList.add(channel);
+                })).get();
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
 

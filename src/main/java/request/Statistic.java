@@ -1,4 +1,4 @@
-package entity.request;
+package request;
 
 public class Statistic {
     private String subscriberCount;

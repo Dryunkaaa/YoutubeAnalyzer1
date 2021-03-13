@@ -13,7 +13,6 @@ public class JsonMapper {
 
         public String writeValue(Object value) {
             return JSON.toJSONString(value);
-
         }
     };
 

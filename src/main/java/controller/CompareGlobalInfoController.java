@@ -10,13 +10,13 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
-import service.AlertService;
+import service.Alerter;
 import service.ChannelInfoService;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class CompareGlobalInfoController extends AbstractController implements Initializable {
+public class CompareGlobalInfoController extends AbstractController implements Initializable, Alerter {
 
     @FXML
     private ImageView imageView;
@@ -68,7 +68,7 @@ public class CompareGlobalInfoController extends AbstractController implements I
                 showChannelsDataIntoTable(tableView, nameColumn, dateColumn, subsColumn, videoColumn, viewsColumn, channelsList);
                 showOperationTime(timeText, start);
             } else {
-                new AlertService().showMessage("Исправьте кол-во каналов");
+                alert("Исправьте кол-во каналов");
             }
         });
     }

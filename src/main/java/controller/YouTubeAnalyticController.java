@@ -9,7 +9,7 @@ import javafx.scene.image.ImageView;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class YouTubeAnalyticController extends AbstractController implements Initializable{
+public class YouTubeAnalyticController extends AbstractController implements Initializable {
 
     @FXML
     private ImageView imageView;
@@ -37,13 +37,13 @@ public class YouTubeAnalyticController extends AbstractController implements Ini
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        new Thread(()-> rotatePicture(imageView)).start();
+        new Thread(() -> rotatePicture(imageView)).start();
 
         backToMainScreen.setOnAction(event -> new MainMenuController().show());
         globalInfoChannel.setOnAction(event -> new GlobalInfoController().show());
         compareGlobalInfo.setOnAction(event -> new CompareGlobalInfoController().show());
         sortByInfo.setOnAction(event -> new InfoSortingController().show());
-        mediaResonance.setOnAction(event ->  new MediaResonanceController().show());
+        mediaResonance.setOnAction(event -> new MediaResonanceController().show());
         compareMediaResonanse.setOnAction(event -> new CompareMediaResonanceController().show());
         sortByMediaResonanse.setOnAction(event -> new MediaResonanceSortingController().show());
     }

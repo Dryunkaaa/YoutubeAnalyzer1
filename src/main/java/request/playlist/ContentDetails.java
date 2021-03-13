@@ -1,4 +1,4 @@
-package entity.request.playlist;
+package request.playlist;
 
 public class ContentDetails {
     private String videoId;

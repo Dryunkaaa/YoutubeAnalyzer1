@@ -8,9 +8,9 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.Scanner;
 
 public class CacheService {
@@ -18,9 +18,7 @@ public class CacheService {
     private String pathToCacheFile;
 
     public CacheService() {
-        Properties properties = new PropertiesProvider().get();
-        String pathToCacheFolder = properties.getProperty("cache.path");
-        this.pathToCacheFile = pathToCacheFolder + "/channels.txt";
+        this.pathToCacheFile = PropertiesProvider.getProps().getProperty("cache.path") + "/channels.txt";
     }
 
     public boolean channelExists(String channelId) {
@@ -60,7 +58,7 @@ public class CacheService {
     public void saveChannel(Channel channel) {
         try {
             Writer writer = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(new File(pathToCacheFile), true), "UTF-8"));
+                    new FileOutputStream(pathToCacheFile, true), StandardCharsets.UTF_8));
             writer.write(JSON.toJSONString(channel) + "\n");
             writer.flush();
             writer.close();
@@ -77,6 +75,7 @@ public class CacheService {
         }
 
         removeFromCache(channel);
+
         return false;
     }
 
@@ -91,12 +90,13 @@ public class CacheService {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+
         return cachedChannels;
     }
 
     private void clearCache() {
         try {
-            PrintWriter writer = new PrintWriter(new File(pathToCacheFile));
+            PrintWriter writer = new PrintWriter(pathToCacheFile);
             writer.print("");
             writer.close();
         } catch (FileNotFoundException e) {
@@ -124,5 +124,4 @@ public class CacheService {
 
         return new Channel();
     }
-
 }

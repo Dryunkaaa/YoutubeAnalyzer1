@@ -1,4 +1,4 @@
-package entity.request.playlist;
+package request.playlist;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -9,11 +9,11 @@ public class ResponseComment {
     private String nextPageToken;
     private ItemPlaylist<ContentDetails>[] items;
 
-    private ResponseComment(){}
+    private ResponseComment() { }
 
     public static ResponseComment getInstance(String playlistId, String page) throws UnirestException {
         HttpResponse<ResponseComment> response = Unirest.get("https://www.googleapis.com/youtube/v3/playlistItems")
-                .queryString("key", new ApiKeyProvider().getApi())
+                .queryString("key", ApiKeyProvider.getKey())
                 .queryString("playlistId", playlistId)
                 .queryString("maxResults", 50)
                 .queryString("pageToken", page)

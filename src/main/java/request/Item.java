@@ -1,4 +1,4 @@
-package entity.request;
+package request;
 
 public class Item<T, G, K> {
     private T snippet;

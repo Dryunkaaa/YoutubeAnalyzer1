@@ -24,7 +24,7 @@ public class MainMenuController extends AbstractController implements Initializa
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        new Thread(()-> rotatePicture(imageView)).start();
+        new Thread(() -> rotatePicture(imageView)).start();
 
         analytic.setOnAction(event1 -> new YouTubeAnalyticController().show());
         settings.setOnAction(event -> new SettingsController().show());

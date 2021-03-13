@@ -15,7 +15,6 @@ import service.MediaResonanceService;
 import service.sorting.CommentsSorting;
 
 import java.net.URL;
-import java.util.Collections;
 import java.util.ResourceBundle;
 
 public class MediaResonanceSortingController extends AbstractController implements Initializable {
@@ -69,7 +68,7 @@ public class MediaResonanceSortingController extends AbstractController implemen
         searchButton.setOnAction(event -> {
             long start = System.currentTimeMillis();
             ObservableList<Channel> channelsList = new MediaResonanceService().getChannelsList(channelIdField.getText());
-            Collections.sort(channelsList, new CommentsSorting().getComparator());
+            channelsList.sort(new CommentsSorting().getComparator());
 
             commentsColumn.setCellValueFactory(new PropertyValueFactory<>("commentsCount"));
             showChannelsDataIntoTable(tableView, nameColumn, dateColumn, subsColumn, videoColumn, viewsColumn, channelsList);

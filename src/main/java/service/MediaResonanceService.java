@@ -8,35 +8,25 @@ import javafx.collections.ObservableList;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class MediaResonanceService {
 
-    private ExecutorProvider executorProvider = ExecutorProvider.getInstance();
+    private Channel channel;
 
     public Channel getChannel(String channelId) {
-        Properties properties = new PropertiesProvider().get();
-        boolean useCache = Boolean.parseBoolean(properties.getProperty("cache.use"));
+        boolean useCache = Boolean.parseBoolean(PropertiesProvider.getProps().getProperty("cache.use"));
         CacheService cacheService = new CacheService();
-        Channel channel = null;
+
+        if (useCache && cacheService.channelContainsComments(channelId)) {
+            return cacheService.getChannelFromCache(channelId);
+        }
+
+        channel = new RequestService().getChannelWithComments(channelId);
 
         if (useCache) {
-
-            if (cacheService.channelContainsComments(channelId)) {
-                channel = cacheService.getChannelFromCache(channelId);
-            } else {
-                channel = new RequestService().getChannelWithComments(channelId);
-
-                Channel finalChannel = channel;
-                executorProvider.getExecutorService().submit(() -> {
-                    cacheService.saveChannel(finalChannel);
-                });
-            }
-
-        } else {
-            channel = new RequestService().getChannelWithComments(channelId);
+            ExecutorProvider.executorService.submit(() -> cacheService.saveChannel(channel));
         }
 
         return channel;
@@ -49,20 +39,13 @@ public class MediaResonanceService {
 
         for (int i = 0; i < ids.length; i++) {
             int index = i;
-
-            Future future = executorProvider.getExecutorService().submit(() -> {
-                channelsList.add(getChannel(ids[index]));
-            });
-
-            tasks.add(future);
+            tasks.add(ExecutorProvider.executorService.submit(() -> channelsList.add(getChannel(ids[index]))));
         }
 
         for (Future future : tasks) {
             try {
                 future.get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         }

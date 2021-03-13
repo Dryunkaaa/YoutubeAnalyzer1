@@ -1,11 +1,26 @@
 package entity.provider;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
 public class ApiKeyProvider {
 
-    // private static final String API_KEY = "AIzaSyD_kAboIzzECcXH8BdjcKsxnKKvegokkO4";
-    private static final String API_KEY = "AIzaSyC2ifnf7hb8O20jZlGqwskw3lpWB_fX0LM";
+    private static String apiKey = "";
 
-    public String getApi() {
-        return API_KEY;
+    public static String getKey() {
+        if (apiKey.isEmpty()) {
+            loadKey("api.txt");
+        }
+
+        return apiKey;
+    }
+
+    private static void loadKey(String fileName) {
+        try {
+            apiKey = new BufferedReader(new FileReader(fileName)).readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

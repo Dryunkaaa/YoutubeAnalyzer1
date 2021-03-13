@@ -16,7 +16,7 @@ public class Channel {
     private Date creationDate;
     private long commentsCount;
 
-    public Channel(){}
+    public Channel() {}
 
     public Channel(String id, String name, String date, long subscribersCount, long videoCount,
                    long viewsCount, long commentsCount) {
@@ -97,7 +97,6 @@ public class Channel {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        ;
     }
 
     public void setCommentsCount(long commentsCount) {
@@ -106,11 +105,15 @@ public class Channel {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Channel channel = (Channel) o;
-        return Objects.equals(id, channel.id) &&
-                Objects.equals(name, channel.name);
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        return Objects.equals(id, ((Channel) o).id) && Objects.equals(name, ((Channel) o).name);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package entity.request.video;
+package request.video;
 
 public class ItemVideo<T> {
     private T statistics;
